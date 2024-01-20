@@ -1,25 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: trebours <trebours@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/18 09:43:54 by trebours          #+#    #+#             */
-/*   Updated: 2024/01/19 11:07:59 by trebours         ###   ########.fr       */
+/*   Created: 2024/01/19 11:00:12 by trebours          #+#    #+#             */
+/*   Updated: 2024/01/20 09:04:33 by trebours         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#include "pipex.h"
 
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include "ft_printf.h"
-
-void	error_first_file(char *file);
-void	ft_touch_file(char *file);
-void	ft_rm_file(char *file);
-
-#endif
+void	error_first_file(char *file)
+{
+	dup2(2, 1);
+	ft_printf("pipex: %s: No such file in directory\n", file);
+	exit(EXIT_FAILURE);
+}
