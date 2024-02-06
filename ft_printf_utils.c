@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trebours <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: trebours <trebours@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 13:22:56 by trebours          #+#    #+#             */
-/*   Updated: 2023/12/08 13:23:34 by trebours         ###   ########.fr       */
+/*   Updated: 2024/01/23 13:38:38 by trebours         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_strlen(char *src)
+int	ft_strlen(const char *src)
 {
 	int	i;
 

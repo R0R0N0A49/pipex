@@ -1,7 +1,7 @@
 NAME=pipex
 CC=cc
 CFLAG= -Werror -Wall -Wextra -g
-SRCS= pipex.c error.c creat_file.c ft_printf.c ft_printf_utils.c
+SRCS= pipex.c error_and_free.c ft_split.c init_struct.c ft_itoa.c create_cmd.c ft_printf.c ft_printf_utils.c
 OBJS=$(SRCS:.c=.o)
 RM=rm -f
 
