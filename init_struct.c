@@ -6,7 +6,7 @@
 /*   By: trebours <trebours@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/25 13:52:59 by trebours          #+#    #+#             */
-/*   Updated: 2024/02/06 10:19:21 by trebours         ###   ########.fr       */
+/*   Updated: 2024/02/10 09:31:21 by trebours         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,18 +93,8 @@ void	ft_initilis_struc(char **argv, char **envp, t_link_cmd *p)
 {
 	p->cmd_2 = split_modif(argv[2]);
 	p->cmd_1 = split_modif(argv[1]);
-	p->fd_file_1 = open(argv[0], O_WRONLY);
+	p->fd_file_1 = open(argv[0], O_RDONLY);
 	p->fd_file_2 = open(argv[3], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (p->fd_file_1 < 0)
-		exit(1);
-	if (p->fd_file_2 < 0)
-	{
-		ft_printf("pipex: permission denied: %s\n", argv[3]);
-		ft_free_tab(p->cmd_2);
-		ft_free_tab(p->cmd_1);
-		close (p->fd_file_1);
-		exit(1);
-	}
 	ft_init_link(envp, p);
 	free(p->cmd_2[0]);
 	free(p->cmd_1[0]);

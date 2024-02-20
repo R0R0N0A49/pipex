@@ -6,7 +6,7 @@
 /*   By: trebours <trebours@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 09:30:59 by trebours          #+#    #+#             */
-/*   Updated: 2024/02/06 10:18:34 by trebours         ###   ########.fr       */
+/*   Updated: 2024/02/10 10:53:41 by trebours         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,71 +40,65 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	return (rsl);
 }
 
-static void	ft_command_n(char **link_cmd_1, char ***command_1, char **envp)
+void	child_process(t_link_cmd *vars, char *envp[])
 {
-	pid_t			tfork;
-
-	tfork = fork();
-	if (tfork == 0)
-	{
-		if (command_1[0][0] && execve(link_cmd_1[0], command_1[0], envp) == -1)
-			perror("pipex: execve");
-	}
-	else
-	{
-		wait(NULL);
-		return ;
-	}
+	close(vars->pipe[0]);
+	close(vars->fd_file_2);
+	dup2(vars->fd_file_1, STDIN_FILENO);
+	dup2(vars->pipe[1], STDOUT_FILENO);
+	execve(vars->cmd_1[0], vars->cmd_1, envp);
+	perror("Execve");
+	ft_free_tab(vars->cmd_1);
+	ft_free_tab(vars->cmd_2);
+	exit(1);
 }
 
-void	ft_pipex(t_link_cmd *seting, char **envp)
+void	second_child_process(t_link_cmd *vars, char *envp[])
 {
-	int		p[2];
-	pid_t	tfork;
+	close (vars->pipe[1]);
+	dup2(vars->pipe[0], STDIN_FILENO);
+	close (vars->pipe[0]);
+	dup2(vars->fd_file_2, STDOUT_FILENO);
+	close (vars->fd_file_2);
+	execve(vars->cmd_2[0], vars->cmd_2, envp);
+	perror("Execve");
+	ft_free_tab(vars->cmd_1);
+	ft_free_tab(vars->cmd_2);
+	exit(1);
+}
 
-	pipe(p);
-	tfork = fork();
-	if (tfork < 0)
+void	parent_process(t_link_cmd *vars, char *envp[])
+{
+	pid_t	pid2;
+
+	pid2 = fork();
+	if (pid2 == -1)
+	{
+		perror("Error : ");
 		exit(1);
-	if (tfork == 0)
-	{
-		dup2(seting->fd_file_1, STDIN_FILENO);
-		dup2(p[1], STDOUT_FILENO);
-		close(seting->fd_file_2);
-		ft_command_n(&seting->link_1, &seting->cmd_1, envp);
-		ft_close(p);
 	}
+	if (pid2 == 0)
+		second_child_process(vars, envp);
 	else
 	{
-		wait(NULL);
-		dup2(p[0], STDIN_FILENO);
-		dup2(seting->fd_file_2, STDOUT_FILENO);
-		close(p[1]);
-		close(seting->fd_file_1);
-		ft_command_n(&seting->link_2, &seting->cmd_2, envp);
-		close(p[0]);
+		close(vars->fd_file_1);
+		close(vars->fd_file_2);
+		close (vars->pipe[1]);
+		close (vars->pipe[0]);
+		while (waitpid(-1, NULL, 0) != -1)
+			continue ;
 	}
 }
 
-int	main(int argc, char **argv, char **envp)
+void	pipex(t_link_cmd *vars, char *envp[])
 {
-	t_link_cmd	cmd_and_link;
+	pid_t	pid1;
 
-	if (argc != 5)
-	{
-		ft_printf
-			("Pipex: argv: \"file1\" \"command1\" \"command2\" \"file2\"\n");
-		return (0);
-	}
-	if (access(argv[1], F_OK))
-		error_first_file(argv[1]);
-	cmd_and_link.path = NULL;
-	ft_initilis_struc(&argv[1], envp, &cmd_and_link);
-	ft_pipex(&cmd_and_link, envp);
-	ft_free_tab(cmd_and_link.cmd_1);
-	ft_free_tab(cmd_and_link.cmd_2);
-	free(cmd_and_link.link_1);
-	free(cmd_and_link.link_2);
-	close(cmd_and_link.fd_file_1);
-	close(cmd_and_link.fd_file_2);
+	pid1 = fork();
+	if (pid1 == -1)
+		exit(1);
+	if (pid1 == 0)
+		child_process(vars, envp);
+	else
+		parent_process(vars, envp);
 }
